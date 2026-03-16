@@ -45,7 +45,6 @@
         }
         input:focus { outline: none; border-color: #00E676; box-shadow: 0 0 8px rgba(0, 230, 118, 0.2); }
         
-        /* Highlight the link paste box */
         #form-link { border-left: 4px solid #bb86fc; }
         
         button {
@@ -115,21 +114,27 @@ function generateMagicLink() {
     const phone = document.getElementById('phone').value.trim();
     const usn = document.getElementById('usn').value.trim();
     
-    // Basic validation
+    // Catch short links
+    if (rawLink.includes("forms.gle")) {
+        return alert("❌ ERROR: You pasted a short link!\n\nOpen that link in your browser first, then copy the LONG link from the address bar (it should say docs.google.com/forms...) and paste it here.");
+    }
+
     if (!rawLink || !rawLink.includes("docs.google.com/forms")) {
-        return alert("Bro, paste a valid Google Form link first!");
+        return alert("Bro, paste a valid long Google Form link first!");
     }
     if (!name || !email || !phone) {
         return alert("Bro, fill in your Name, Email, and Phone!");
     }
 
-    // Get today's date in YYYY-MM-DD format for the forms
     const today = new Date().toISOString().split('T')[0];
     const params = new URLSearchParams();
+    let baseUrl = "";
 
-    // Determine which quiz they pasted by looking at the unique ID in the URL
-    if (rawLink.includes("1FAIpQLSeU7AZlJyKX8_LK5tQWGxPQhuF-CBni2SXpvywyP7bBLBVf7A")) {
-        // --- PYTHON QUIZ ---
+    // --- PYTHON QUIZ (Checks both Public and Editor IDs) ---
+    if (rawLink.includes("1FAIpQLSeU7AZlJyKX8_LK5tQWGxPQhuF-CBni2SXpvywyP7bBLBVf7A") || rawLink.includes("167DM2gMAr722o-O0iBHwUb8yf1Pfy8v6eEWSmqzaamI")) {
+        // Force the URL to the reliable public viewform endpoint
+        baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeU7AZlJyKX8_LK5tQWGxPQhuF-CBni2SXpvywyP7bBLBVf7A/viewform";
+        
         params.append("entry.862231310", email);
         params.append("entry.1153648703", name);
         params.append("entry.82800352", phone);
@@ -155,8 +160,10 @@ function generateMagicLink() {
         };
         for (let id in pyAns) params.append(`entry.${id}`, pyAns[id]);
 
-    } else if (rawLink.includes("1FAIpQLSeqLQyPfu2zfdS1-eddyebVJMC9ypoGhJhQtpO0RBGGflTw3A")) {
-        // --- HTML QUIZ ---
+    // --- HTML QUIZ (Checks both Public and Editor IDs) ---
+    } else if (rawLink.includes("1FAIpQLSeqLQyPfu2zfdS1-eddyebVJMC9ypoGhJhQtpO0RBGGflTw3A") || rawLink.includes("11PVHqBgRecZQo2gQJTEBEEgZIbHsX4l8bN87ZXolLw4")) {
+        baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeqLQyPfu2zfdS1-eddyebVJMC9ypoGhJhQtpO0RBGGflTw3A/viewform";
+        
         params.append("entry.862231310", email);
         params.append("entry.1812341125", name);
         params.append("entry.82800352", phone);
@@ -173,8 +180,10 @@ function generateMagicLink() {
         };
         for (let id in htmlAns) params.append(`entry.${id}`, htmlAns[id]);
 
-    } else if (rawLink.includes("1FAIpQLScaanL5hwtw-ZPfKFAFgDK0tu87sfY0Bb4PF6ndVRiIMh2hKQ")) {
-        // --- DJANGO QUIZ ---
+    // --- DJANGO QUIZ (Checks both Public and Editor IDs) ---
+    } else if (rawLink.includes("1FAIpQLScaanL5hwtw-ZPfKFAFgDK0tu87sfY0Bb4PF6ndVRiIMh2hKQ") || rawLink.includes("1oY7iLHXoty3UQK90Oaz6KNQbiO8JtEetbeHo6qrmWhE")) {
+        baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLScaanL5hwtw-ZPfKFAFgDK0tu87sfY0Bb4PF6ndVRiIMh2hKQ/viewform";
+        
         params.append("entry.862231310", email);
         params.append("entry.1812341125", name);
         params.append("entry.82800352", phone);
@@ -195,17 +204,11 @@ function generateMagicLink() {
         for (let id in djangoAns) params.append(`entry.${id}`, djangoAns[id]);
         
     } else {
-        return alert("Unrecognized Quiz Link! Make sure it's the exact Python, HTML, or Django link from your teacher.");
+        return alert("Unrecognized Quiz Link!\n\nMake sure it's the exact link for the Python, HTML, or Django quiz.");
     }
 
-    // Clean up the raw link to ensure it ends in /viewform before appending params
-    let cleanUrl = rawLink.split('?')[0]; 
-    if (!cleanUrl.endsWith('/viewform')) {
-        cleanUrl = cleanUrl.replace('/edit', '/viewform');
-    }
-
-    // Redirect to the pre-filled form
-    window.location.href = cleanUrl + "?" + params.toString();
+    // Redirect to the perfect pre-filled form
+    window.location.href = baseUrl + "?" + params.toString();
 }
 </script>
 
