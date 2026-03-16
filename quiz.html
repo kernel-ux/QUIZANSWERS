@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Bypass Hub</title>
+    <title>Ghost Filler Hub</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #121212;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #0f0f11;
             color: #e0e0e0;
             display: flex;
             justify-content: center;
@@ -18,57 +18,66 @@
             box-sizing: border-box;
         }
         .container {
-            background-color: #1e1e1e;
-            padding: 30px;
+            background-color: #1a1a1d;
+            padding: 35px 30px;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            border: 1px solid #2a2a2d;
         }
-        h2 { color: #00E676; margin-top: 0; text-align: center; }
+        h2 { color: #00E676; margin-top: 0; text-align: center; font-size: 28px; letter-spacing: 1px; }
+        p.subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 30px; }
+        
         .form-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 8px; font-size: 14px; color: #aaa; }
-        select, input {
+        label { display: block; margin-bottom: 8px; font-size: 13px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold;}
+        
+        input {
             width: 100%;
             padding: 14px;
-            background-color: #2c2c2c;
-            border: 1px solid #444;
+            background-color: #252528;
+            border: 1px solid #3a3a3d;
             border-radius: 8px;
             color: white;
-            font-size: 16px;
+            font-size: 15px;
             box-sizing: border-box;
+            transition: 0.3s;
         }
-        select:focus, input:focus { outline: none; border-color: #00E676; }
+        input:focus { outline: none; border-color: #00E676; box-shadow: 0 0 8px rgba(0, 230, 118, 0.2); }
+        
+        /* Highlight the link paste box */
+        #form-link { border-left: 4px solid #bb86fc; }
+        
         button {
             width: 100%;
             padding: 16px;
-            margin-top: 10px;
+            margin-top: 15px;
             background-color: #00E676;
             color: #000;
             border: none;
             border-radius: 8px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
             transition: 0.2s;
         }
-        button:hover { background-color: #00c853; }
-        .footer { text-align: center; margin-top: 25px; font-size: 12px; color: #666; }
+        button:hover { background-color: #00c853; transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+        
+        .footer { text-align: center; margin-top: 25px; font-size: 12px; color: #555; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Ghost Filler 👻</h2>
-    <p style="text-align: center; color: #888; font-size: 14px; margin-bottom: 25px;">Enter your details to generate a 100% pre-filled form link.</p>
+    <h2>GHOST FILLER</h2>
+    <p class="subtitle">Paste your quiz link. Get a 100% pre-filled form.</p>
     
     <div class="form-group">
-        <label>Select Target Quiz</label>
-        <select id="quiz-type">
-            <option value="python">Python Quiz</option>
-            <option value="html">HTML Quiz</option>
-            <option value="django">Django Quiz</option>
-        </select>
+        <label>Paste Quiz Link Here</label>
+        <input type="url" id="form-link" placeholder="https://docs.google.com/forms/d/e/...">
     </div>
 
     <div class="form-group">
@@ -86,12 +95,12 @@
         <input type="tel" id="phone" placeholder="10-digit number">
     </div>
 
-    <div class="form-group" id="usn-group">
-        <label>USN (For Python Quiz Only)</label>
-        <input type="text" id="usn" placeholder="E.g. 1HK25CS000">
+    <div class="form-group">
+        <label>USN (Optional)</label>
+        <input type="text" id="usn" placeholder="Only needed for Python quiz">
     </div>
 
-    <button onclick="generateMagicLink()">Get My Perfect Quiz</button>
+    <button onclick="generateMagicLink()">Inject Answers</button>
 
     <div class="footer">
         Bypasses mobile restrictions. Just scroll down and hit submit.
@@ -99,45 +108,35 @@
 </div>
 
 <script>
-// Hide USN field if HTML or Django is selected
-document.getElementById('quiz-type').addEventListener('change', function() {
-    if(this.value === 'python') {
-        document.getElementById('usn-group').style.display = 'block';
-    } else {
-        document.getElementById('usn-group').style.display = 'none';
-    }
-});
-
 function generateMagicLink() {
-    const quizType = document.getElementById('quiz-type').value;
+    const rawLink = document.getElementById('form-link').value.trim();
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const phone = document.getElementById('phone').value.trim();
     const usn = document.getElementById('usn').value.trim();
     
-    // Get today's date in YYYY-MM-DD format for the forms
-    const today = new Date().toISOString().split('T')[0];
-
+    // Basic validation
+    if (!rawLink || !rawLink.includes("docs.google.com/forms")) {
+        return alert("Bro, paste a valid Google Form link first!");
+    }
     if (!name || !email || !phone) {
-        alert("Bro, fill in your Name, Email, and Phone first!");
-        return;
+        return alert("Bro, fill in your Name, Email, and Phone!");
     }
 
-    let baseUrl = "";
+    // Get today's date in YYYY-MM-DD format for the forms
+    const today = new Date().toISOString().split('T')[0];
     const params = new URLSearchParams();
 
-    if (quizType === "python") {
-        baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeU7AZlJyKX8_LK5tQWGxPQhuF-CBni2SXpvywyP7bBLBVf7A/viewform";
-        
-        // Python Personal Details
+    // Determine which quiz they pasted by looking at the unique ID in the URL
+    if (rawLink.includes("1FAIpQLSeU7AZlJyKX8_LK5tQWGxPQhuF-CBni2SXpvywyP7bBLBVf7A")) {
+        // --- PYTHON QUIZ ---
         params.append("entry.862231310", email);
         params.append("entry.1153648703", name);
         params.append("entry.82800352", phone);
-        params.append("entry.1812341125", usn);
+        params.append("entry.1812341125", usn || "Not Provided");
         params.append("entry.1606234610", "HKBK College of Engineering");
         params.append("entry.1675952199", today);
 
-        // Python Answers
         const pyAns = {
             "1687348338": "Guido van Rossum", "457200217": "Interpreted", "705990197": "#",
             "1186409837": "print()", "1979733469": "input()", "391306647": "if",
@@ -156,16 +155,13 @@ function generateMagicLink() {
         };
         for (let id in pyAns) params.append(`entry.${id}`, pyAns[id]);
 
-    } else if (quizType === "html") {
-        baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeqLQyPfu2zfdS1-eddyebVJMC9ypoGhJhQtpO0RBGGflTw3A/viewform";
-        
-        // HTML Personal Details
+    } else if (rawLink.includes("1FAIpQLSeqLQyPfu2zfdS1-eddyebVJMC9ypoGhJhQtpO0RBGGflTw3A")) {
+        // --- HTML QUIZ ---
         params.append("entry.862231310", email);
         params.append("entry.1812341125", name);
         params.append("entry.82800352", phone);
         params.append("entry.192342574", today);
 
-        // HTML Answers (includes intentional wrong answers for 20/20)
         const htmlAns = {
             "476017059": "Hyper Text Markup Language", "435596838": "Tim Berners-Lee",
             "1058330736": "<a>", "2134741813": "<img>", "547437122": "src",
@@ -177,16 +173,13 @@ function generateMagicLink() {
         };
         for (let id in htmlAns) params.append(`entry.${id}`, htmlAns[id]);
 
-    } else if (quizType === "django") {
-        baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLScaanL5hwtw-ZPfKFAFgDK0tu87sfY0Bb4PF6ndVRiIMh2hKQ/viewform";
-        
-        // Django Personal Details
+    } else if (rawLink.includes("1FAIpQLScaanL5hwtw-ZPfKFAFgDK0tu87sfY0Bb4PF6ndVRiIMh2hKQ")) {
+        // --- DJANGO QUIZ ---
         params.append("entry.862231310", email);
         params.append("entry.1812341125", name);
         params.append("entry.82800352", phone);
         params.append("entry.192342574", today);
 
-        // Django Answers (includes intentional wrong answers for max score)
         const djangoAns = {
             "476017059": "Python", "435596838": "Django Software Foundation",
             "1058330736": "MVT", "2134741813": "django-admin startproject",
@@ -200,11 +193,19 @@ function generateMagicLink() {
             "863993020": "apps.py", "1766048953": "render()", "1405241629": "urls.py"
         };
         for (let id in djangoAns) params.append(`entry.${id}`, djangoAns[id]);
+        
+    } else {
+        return alert("Unrecognized Quiz Link! Make sure it's the exact Python, HTML, or Django link from your teacher.");
+    }
+
+    // Clean up the raw link to ensure it ends in /viewform before appending params
+    let cleanUrl = rawLink.split('?')[0]; 
+    if (!cleanUrl.endsWith('/viewform')) {
+        cleanUrl = cleanUrl.replace('/edit', '/viewform');
     }
 
     // Redirect to the pre-filled form
-    const finalUrl = baseUrl + "?" + params.toString();
-    window.location.href = finalUrl;
+    window.location.href = cleanUrl + "?" + params.toString();
 }
 </script>
 
